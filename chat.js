@@ -14,6 +14,7 @@ app.directive("chat", function($location, $anchorScroll){
 app.controller("MainCtl", function ($scope) {
 	$scope.log = [];
 	$scope.message = "";
+	var nick = prompt("Enter nickname:");
 
 	if (!window["WebSocket"]) {
 		$scope.log.push("Your browser does not support WebSockets.");
@@ -48,7 +49,7 @@ app.controller("MainCtl", function ($scope) {
 			return;
 		}
 
-		conn.send($scope.message);
+		conn.send(nick + ": " + $scope.message);
 		$scope.message = "";
 	}
 });

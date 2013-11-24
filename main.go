@@ -4,7 +4,6 @@ import (
 	"flag"
 	"github.com/gorilla/websocket"
 	"github.com/jakecoffman/golang-websockets/chat"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -12,12 +11,6 @@ import (
 var addr = flag.String("addr", ":8080", "http service address")
 var indexFile = "index.html"
 var h chat.Hub
-
-func homeHandler(response []byte) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write(response)
-	}
-}
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	ws, err := websocket.Upgrade(w, r, nil, 1024, 1024)
@@ -35,16 +28,12 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	index, err := ioutil.ReadFile(indexFile)
-	if err != nil {
-		panic(err)
-	}
 	flag.Parse()
 	h = chat.NewHub()
 
 	go h.Run()
 
-	http.HandleFunc("/", homeHandler(index))
+	http.Handle("/", http.FileServer(http.Dir(".")))
 	http.HandleFunc("/ws", wsHandler)
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
