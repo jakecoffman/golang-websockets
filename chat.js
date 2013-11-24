@@ -1,5 +1,16 @@
 var app = angular.module("chat", []);
 
+app.directive("chat", function($location, $anchorScroll){
+	return {
+		link: function(scope, element, attrs){
+			$location.hash('bottom');
+			scope.$watch("log", function(){
+				$anchorScroll();
+			}, true);
+		}
+	}
+});
+
 app.controller("MainCtl", function ($scope) {
 	$scope.log = [];
 	$scope.message = "";

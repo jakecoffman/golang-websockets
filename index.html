@@ -4,10 +4,11 @@
 	<link type="text/css" rel="stylesheet" href="chat.css">
 </head>
 <body ng-app="chat" ng-controller="MainCtl">
-<div id="log" scrollBottom>
+<div id="log" chat>
 	<ul class="unstyled">
 		<li ng-repeat="l in log track by $index">{{l}}</li>
 	</ul>
+	<div id="bottom"></div>
 </div>
 <form id="form">
 	<input type="submit" value="Send" ng-click="send()"/>
