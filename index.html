@@ -1,15 +1,19 @@
 <html>
 <head>
-<title>Chat Example</title>
-<link type="text/css" rel="stylesheet" href="chat.css">
+	<title>Chat Example</title>
+	<link type="text/css" rel="stylesheet" href="chat.css">
 </head>
-<body>
-<div id="log"></div>
+<body ng-app="chat" ng-controller="MainCtl">
+<div id="log" scrollBottom>
+	<ul class="unstyled">
+		<li ng-repeat="l in log track by $index">{{l}}</li>
+	</ul>
+</div>
 <form id="form">
-    <input type="submit" value="Send" />
-    <input type="text" id="msg" size="64"/>
+	<input type="submit" value="Send" ng-click="send()"/>
+	<input type="text" ng-model="message" size="64"/>
 </form>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.2/angular.min.js"></script>
 <script type="text/javascript" src="chat.js"></script>
 </body>
 </html>

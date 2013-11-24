@@ -1,5 +1,9 @@
 package chat
 
+import (
+	"fmt"
+)
+
 type Hub struct {
 	// Registered connections.
 	connections map[*Connection]bool
@@ -35,11 +39,14 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case c := <-h.register:
+			fmt.Println("Connect")
 			h.connections[c] = true
 		case c := <-h.unregister:
+			fmt.Println("Disconnect")
 			delete(h.connections, c)
 			close(c.send)
 		case m := <-h.broadcast:
+			fmt.Printf("Broadcasting: %s\n", m)
 			for c := range h.connections {
 				select {
 				case c.send <- m:

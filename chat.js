@@ -1,44 +1,44 @@
-$(function () {
+var app = angular.module("chat", []);
 
-	var conn;
-	var msg = $("#msg");
-	var log = $("#log");
+app.controller("MainCtl", function ($scope) {
+	$scope.log = [];
+	$scope.message = "";
 
-	function appendLog(msg) {
-		var d = log[0];
-		var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
-		msg.appendTo(log);
-		if (doScroll) {
-			d.scrollTop = d.scrollHeight - d.clientHeight;
-		}
+	if (!window["WebSocket"]) {
+		$scope.log.push("Your browser does not support WebSockets.");
+		return;
 	}
+	var conn = new WebSocket("ws://localhost:8080/ws");
+	conn.onclose = function (e) {
+		$scope.$apply(function () {
+			$scope.log.push("Connection closed.");
+		})
+	};
 
-	$("#form").submit(function () {
+	conn.onmessage = function (e) {
+		$scope.$apply(function () {
+			$scope.log.push(e.data);
+		})
+	};
+
+	conn.onopen = function (e) {
+		console.log("Connected");
+		$scope.$apply(function () {
+			$scope.log.push("Welcome to the chat!");
+		})
+	};
+
+	$scope.send = function () {
 		if (!conn) {
-			return false;
+			return;
 		}
-		if (!msg.val()) {
-			return false;
+
+		if (!$scope.message) {
+			return;
 		}
-		conn.send(msg.val());
-		msg.val("");
-		return false
-	});
 
-	if (window["WebSocket"]) {
-		conn = new WebSocket("ws://localhost:8080/ws");
-		conn.onclose = function(e) {
-			appendLog($("<div><b>Connection closed.</b></div>"))
-		};
-
-		conn.onmessage = function(e) {
-			appendLog($("<div/>").text(e.data))
-		};
-
-		conn.onopen = function(e) {
-			appendLog($("<div><b>Welcome to the chat.</b></div>"));
-		};
-	} else {
-		appendLog($("<div><b>Your browser does not support WebSockets.</b></div>"))
+		conn.send($scope.message);
+		$scope.message = "";
 	}
 });
+
