@@ -13,6 +13,7 @@ var indexFile = "index.html"
 var h chat.Hub
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
+	// Upgrade the HTTP connection to a websocket. TODO: check origin
 	ws, err := websocket.Upgrade(w, r, nil, 1024, 1024)
 	if _, ok := err.(websocket.HandshakeError); ok {
 		http.Error(w, "Not a websocket handshake", 400)

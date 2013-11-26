@@ -1,19 +1,26 @@
 <html>
 <head>
 	<title>Chat Example</title>
+	<link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 	<link type="text/css" rel="stylesheet" href="chat.css">
 </head>
 <body ng-app="chat" ng-controller="MainCtl">
-<div id="log" chat>
-	<ul class="unstyled">
-		<li ng-repeat="l in log track by $index">{{l}}</li>
-	</ul>
-	<div id="bottom"></div>
+<div class="container">
+	<div class="row" chat id="chat">
+		<h1>Chat</h1>
+		<ul class="list-unstyled" id="log">
+			<li ng-repeat="l in log track by $index">{{l}}</li>
+		</ul>
+		<div id="bottom"></div>
+	</div>
+	<div class="row">
+		<form id="form">
+			<input type="submit" value="Send" ng-click="send()" class="btn"/>
+			<input type="text" ng-model="message" size="64" placeholder="Type your message here"/>
+		</form>
+	</div>
 </div>
-<form id="form">
-	<input type="submit" value="Send" ng-click="send()"/>
-	<input type="text" ng-model="message" size="64"/>
-</form>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.2/angular.min.js"></script>
 <script type="text/javascript" src="chat.js"></script>
 </body>
