@@ -1,0 +1,19 @@
+version: '3'
+services:
+  backend:
+    image: golang:1.10
+    volumes:
+      - ./backend:/go/src/backend
+    working_dir: /go/src/backend
+    command: "bash -x /go/src/backend/start.sh"
+    ports:
+      - "8080:8080"
+
+  frontend:
+    image: node:8
+    volumes:
+      - ./frontend:/var/www
+    working_dir: /var/www
+    command: "bash -x /var/www/start.sh"
+    ports:
+      - "8000:8000"

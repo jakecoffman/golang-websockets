@@ -1,0 +1,11 @@
+{
+  "name": "golang-websockets",
+  "version": "0.0.1",
+  "description": "",
+  "dependencies": [
+    "http-server"
+  ],
+  "scripts": {
+    "start": "http-server -p 8000"
+  }
+}
