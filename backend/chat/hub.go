@@ -39,6 +39,7 @@ func (h *Hub) Unregister(c *Connection) {
 
 // Hub's main loop handles commands for the connection map
 func (h *Hub) Run() {
+	fmt.Println("Server up...")
 	for {
 		select {
 		// Adds a connection
