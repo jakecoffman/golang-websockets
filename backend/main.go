@@ -3,13 +3,12 @@ package main
 import (
 	"flag"
 	"github.com/gorilla/websocket"
-	"github.com/jakecoffman/golang-websockets/chat"
+	"./chat"
 	"log"
 	"net/http"
 )
 
-var addr = flag.String("addr", ":8000", "http service address")
-var indexFile = "index.html"
+var addr = flag.String("addr", ":8080", "http service address")
 var h chat.Hub
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +33,6 @@ func main() {
 
 	go h.Run()
 
-	http.Handle("/", http.FileServer(http.Dir(".")))
 	http.HandleFunc("/ws", wsHandler)
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
