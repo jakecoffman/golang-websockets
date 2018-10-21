@@ -12,7 +12,7 @@
 		User: <span ng-bind="user"></span></p>
 		<h2>Room Users</h2>
 		<ul class="list-unstyled" id="users">
-			<li ng-repeat="u in users track by $index">{{u}}</li>
+			<li ng-repeat="u in users track by $index">{{u.name}}</li>
 		</ul>
 		<h2>Log</h2>
 		<ul class="list-unstyled" id="log" style="height: 300px; overflow: auto">

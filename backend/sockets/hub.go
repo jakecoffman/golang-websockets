@@ -2,6 +2,7 @@ package sockets
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 )
 
@@ -9,7 +10,7 @@ import (
 // clients.
 type Hub struct {
 	// Registered clients.
-	clientsByRoom map[string]map[*Client]string
+	clientsByRoom map[string]map[*Client]User
 
 	// Inbound messages from the clients.
 	broadcast chan Message
@@ -21,9 +22,21 @@ type Hub struct {
 	unregister chan Subscription
 }
 
+type User struct {
+	name    string `json:"name,omitempty"`
+	isAdmin bool   `json:"isAdmin,omitempty"`
+}
+
+func NewUser(name string) User {
+	return User{
+		name:    name,
+		isAdmin: false,
+	}
+}
+
 type Subscription struct {
 	room   string
-	user   string
+	user   User
 	client *Client
 }
 
@@ -34,9 +47,9 @@ type Message struct {
 }
 
 type RoomStatus struct {
-	Room   string   `json:"room"`
-	Action string   `json:"action"`
-	Users  []string `json:"users"`
+	Room   string `json:"room"`
+	Action string `json:"action"`
+	Users  []map[string]string `json:"users"`
 }
 
 func NewHub() *Hub {
@@ -44,7 +57,7 @@ func NewHub() *Hub {
 		broadcast:     make(chan Message),
 		register:      make(chan Subscription),
 		unregister:    make(chan Subscription),
-		clientsByRoom: make(map[string]map[*Client]string),
+		clientsByRoom: make(map[string]map[*Client]User),
 	}
 }
 
@@ -52,24 +65,31 @@ func (hub *Hub) Run() {
 	for {
 		select {
 		case subscription := <-hub.register:
-			log.Printf("Hub subscription register: %v %v", subscription.room, subscription.user)
+
+			var usr = NewUser(subscription.user.name)
+			log.Printf("Hub subscription register: %v %v", subscription.room, usr.name)
 			clients := hub.clientsByRoom[subscription.room]
 			if clients == nil {
-				clients = make(map[*Client]string)
+				usr.isAdmin = true /*first user is admin */
+				fmt.Print(subscription)
+				clients = make(map[*Client]User)
+				fmt.Printf("clients ######### \n")
+				fmt.Print(clients)
 				hub.clientsByRoom[subscription.room] = clients
 			}
-			hub.clientsByRoom[subscription.room][subscription.client] = subscription.user
-			hub.broadcastRoomStatus(subscription.room, "Register: " + subscription.user)
+			hub.clientsByRoom[subscription.room][subscription.client] = usr
+			hub.broadcastRoomStatus(subscription.room, "Register: "+usr.name)
 
 		case subscription := <-hub.unregister:
-			log.Printf("Hub subscription unregister: %v %v", subscription.room, subscription.user)
+			var usr = NewUser(subscription.user.name)
+			log.Printf("Hub subscription unregister: %v %v", subscription.room, usr.name)
 			clients := hub.clientsByRoom[subscription.room]
 			if clients != nil {
 				if _, ok := clients[subscription.client]; ok {
 					hub.removeClient(subscription.client, subscription.room)
 				}
 			}
-			hub.broadcastRoomStatus(subscription.room, "Unregister: " + subscription.user)
+			hub.broadcastRoomStatus(subscription.room, "Unregister: "+usr.name)
 
 		case message := <-hub.broadcast:
 			log.Printf("Hub message broadcast: %v %v", message.room, message.user)
@@ -79,23 +99,35 @@ func (hub *Hub) Run() {
 	}
 }
 
-func (hub *Hub) getRoomUsers(room string) []string {
-	var users []string
+func (hub *Hub) getRoomUsers(room string) []map[string]string {
+	var users []map[string]string
 	clients := hub.clientsByRoom[room]
 	for _, user := range clients {
-		users = append(users, user)
+		x := map[string]string {"name":user.name, "isAdmin":"false"}
+		users = append(users, x)
+
+		log.Printf("Room users: %v", user.name)
+
+		//users = append(users, `{name:%d, isAdmin:user.isAdmin}`,user.name )
 	}
 	log.Printf("Room users: %v", users)
+
+
 	return users
 }
 
 func (hub *Hub) broadcastRoomStatus(room string, action string) {
+	fmt.Printf("############ hub.getRoomUsers(room) \n")
+	fmt.Println(hub.getRoomUsers(room))
+
 	log.Printf("Broadcast room status: %v", room)
 	roomStatus := &RoomStatus{
 		Room:   room,
 		Action: action,
-		Users:  hub.getRoomUsers(room)}
+		Users:  hub.getRoomUsers(room),
+	}
 	roomStatusJson, _ := json.Marshal(roomStatus)
+	fmt.Println(roomStatusJson)
 	roomStatusData := []byte(roomStatusJson)
 	hub.broadcastData(roomStatusData, room)
 }

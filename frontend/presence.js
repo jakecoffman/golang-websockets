@@ -43,7 +43,6 @@ app.controller("MainCtl", function ($scope) {
 
 	conn.onopen = function (e) {
 		console.log("Connected");
-
 		$scope.$apply(function () {
 			$scope.log.push("Welcome to the presence example!");
 		})

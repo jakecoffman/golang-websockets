@@ -67,7 +67,7 @@ func (subscription Subscription) readPump() {
 			break
 		}
 		messageData = bytes.TrimSpace(bytes.Replace(messageData, newline, space, -1))
-		message := Message{subscription.room, subscription.user, messageData}
+		message := Message{subscription.room, subscription.user.name, messageData}
 		client.hub.broadcast <- message
 	}
 }
@@ -134,9 +134,10 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 
 	room := r.FormValue("room")
 	user := r.FormValue("user")
+	User := User{user, false}
 
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
-	subscription := Subscription{room, user, client}
+	subscription := Subscription{room, User, client}
 	client.hub.register <- subscription
 
 	// Allow collection of memory referenced by the caller by doing all work in
