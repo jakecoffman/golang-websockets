@@ -1,6 +1,6 @@
-var app = angular.module("chat", []);
+var app = angular.module("presence", []);
 
-app.directive("chat", function($location, $anchorScroll){
+app.directive("presence", function($location, $anchorScroll){
 	return {
 		link: function(scope, element, attrs){
 			$location.hash('bottom');
@@ -13,14 +13,19 @@ app.directive("chat", function($location, $anchorScroll){
 
 app.controller("MainCtl", function ($scope) {
 	$scope.log = [];
-	$scope.message = "";
-	var nick = prompt("Enter nickname:");
+	$scope.users = [];
+
+	$scope.room = prompt("Enter room:");
+	$scope.user = prompt("Enter user:");
 
 	if (!window["WebSocket"]) {
 		$scope.log.push("Your browser does not support WebSockets.");
 		return;
 	}
-	var conn = new WebSocket("ws://localhost:8080/ws");
+
+	// Connect
+	var conn = new WebSocket("ws://localhost:8080/ws?room=" + $scope.room + "&user=" + $scope.user);
+
 	conn.onclose = function (e) {
 		$scope.$apply(function () {
 			$scope.log.push("Connection closed.");
@@ -29,28 +34,18 @@ app.controller("MainCtl", function ($scope) {
 
 	conn.onmessage = function (e) {
 		$scope.$apply(function () {
-			$scope.log.push(e.data);
+			var data = JSON.parse(e.data);
+			console.log(data);
+			$scope.users = data.users
+			$scope.log.push(data.action);
 		})
 	};
 
 	conn.onopen = function (e) {
 		console.log("Connected");
+
 		$scope.$apply(function () {
-			$scope.log.push("Welcome to the chat!");
+			$scope.log.push("Welcome to the presence example!");
 		})
 	};
-
-	$scope.send = function () {
-		if (!conn) {
-			return;
-		}
-
-		if (!$scope.message) {
-			return;
-		}
-
-		conn.send(nick + ": " + $scope.message);
-		$scope.message = "";
-	}
 });
-

@@ -3,9 +3,9 @@ services:
   backend:
     image: golang:1.10
     volumes:
-      - ./backend:/go/src/backend
-    working_dir: /go/src/backend
-    command: "bash -x /go/src/backend/start.sh"
+      - ./backend:/go/src/main
+    working_dir: /go/src/main
+    command: "bash -x /go/src/main/start.sh"
     ports:
       - "8080:8080"
 
