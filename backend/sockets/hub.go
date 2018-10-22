@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -24,13 +25,13 @@ type Hub struct {
 
 type User struct {
 	name    string `json:"name,omitempty"`
-	isAdmin bool   `json:"isAdmin,omitempty"`
+	canSaveStudy bool   `json:"canSaveStudy,omitempty"`
 }
 
 func NewUser(name string) User {
 	return User{
 		name:    name,
-		isAdmin: false,
+		canSaveStudy: false,
 	}
 }
 
@@ -47,8 +48,8 @@ type Message struct {
 }
 
 type RoomStatus struct {
-	Room   string `json:"room"`
-	Action string `json:"action"`
+	Room   string              `json:"room"`
+	Action string              `json:"action"`
 	Users  []map[string]string `json:"users"`
 }
 
@@ -70,7 +71,7 @@ func (hub *Hub) Run() {
 			log.Printf("Hub subscription register: %v %v", subscription.room, usr.name)
 			clients := hub.clientsByRoom[subscription.room]
 			if clients == nil {
-				usr.isAdmin = true /*first user is admin */
+				usr.canSaveStudy = true /*first user is admin */
 				fmt.Print(subscription)
 				clients = make(map[*Client]User)
 				fmt.Printf("clients ######### \n")
@@ -103,15 +104,17 @@ func (hub *Hub) getRoomUsers(room string) []map[string]string {
 	var users []map[string]string
 	clients := hub.clientsByRoom[room]
 	for _, user := range clients {
-		x := map[string]string {"name":user.name, "isAdmin":"false"}
-		users = append(users, x)
+		//userMap := map[string]string{"name": user.name, "canSaveStudy": user.canSaveStudy}
+		userMap := map[string]string{"name": user.name, "canSaveStudy": strconv.FormatBool(user.canSaveStudy)}
+		fmt.Println("** userMap **")
+		fmt.Println(userMap)
+		users = append(users, userMap)
 
 		log.Printf("Room users: %v", user.name)
 
-		//users = append(users, `{name:%d, isAdmin:user.isAdmin}`,user.name )
+		//users = append(users, `{name:%d, canSaveStudy:user.canSaveStudy}`,user.name )
 	}
 	log.Printf("Room users: %v", users)
-
 
 	return users
 }

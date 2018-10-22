@@ -1,25 +1,26 @@
 <html>
 <head>
-	<title>Room Presence Example</title>
-	<link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-	<link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <title>Room Presence Example</title>
+    <link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 </head>
 <body ng-app="presence" ng-controller="MainCtl">
 <div class="container">
-	<div class="row">
-		<h1>Room Presence Example</h1>
-		<p>Room: <span ng-bind="room"></span><br>
-		User: <span ng-bind="user"></span></p>
-		<h2>Room Users</h2>
-		<ul class="list-unstyled" id="users">
-			<li ng-repeat="u in users track by $index">{{u.name}}</li>
-		</ul>
-		<h2>Log</h2>
-		<ul class="list-unstyled" id="log" style="height: 300px; overflow: auto">
-			<li ng-repeat="l in log track by $index">{{l}}</li>
-		</ul>
-		<div id="bottom"></div>
-	</div>
+    <div class="row">
+        <h1>Room Presence Example</h1>
+        <p>Room: <span ng-bind="room"></span><br>
+            User: <span ng-bind="user"></span></p>
+        <h2>Room Users</h2>
+        <ul class="list-unstyled" id="users">
+            <li ng-repeat="u in users track by $index">{{u.name}}
+                <span ng-if="u.canSaveStudy == 'true'">* Can save study </span></li>
+        </ul>
+        <h2>Log</h2>
+        <ul class="list-unstyled" id="log" style="height: 300px; overflow: auto">
+            <li ng-repeat="l in log track by $index">{{l}}</li>
+        </ul>
+        <div id="bottom"></div>
+    </div>
 </div>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.2/angular.min.js"></script>
 <script type="text/javascript" src="presence.js"></script>
